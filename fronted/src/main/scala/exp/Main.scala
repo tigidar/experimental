@@ -1,6 +1,7 @@
 package exp
 
 import kyo.*
+import exp.backend.{Api, DeveloperApi}
 import com.raquo.laminar.api.L.{*, given}
 import org.scalajs.dom
 
@@ -42,24 +43,31 @@ object Page:
       }
     )
 
-def renderDom() =
-  render(
-    appContainer,
-    div(
-      width := "100%",
-      height := "100%",
-      Menu.view,
-      Page.view
+def renderDom(): Unit < (Env[Api] & IO) =
+  for
+    api <- Env.get[Api]
+    _ <- IO(
+      render(
+        appContainer,
+        div(
+          width := "100%",
+          height := "100%",
+          Menu.view,
+          Page.view
+        )
+      )
     )
-  )
+  yield ()
 
 object ExperimentalApp extends KyoApp {
 
-  run {
-    for 
-      _ <- Console.printLine("hello world")
-      _ <- IO(renderDom())
-    yield s"example"
-  }
-}
+  lazy val startApp: Unit < IO = 
+    Memo.run(Env.runLayer(DeveloperApi.backendApiLayer)(renderDom()))
 
+  run {
+    for  
+      _ <- startApp 
+    yield ()
+  }
+
+}
