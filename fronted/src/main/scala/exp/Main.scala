@@ -43,8 +43,7 @@ object Page:
     )
 
 def renderDom() =
-  println("Starting ExperimentalApp in IO ...")
-  renderOnDomContentLoaded(
+  render(
     appContainer,
     div(
       width := "100%",
@@ -53,40 +52,14 @@ def renderDom() =
       Page.view
     )
   )
-  println("container rendered")
-  10
 
 object ExperimentalApp extends KyoApp {
-
-  val test: Unit < 10 =
-    IO(println(42))
 
   run {
     for 
       _ <- Console.printLine("hello world")
       _ <- IO(renderDom())
-    yield "example"
+    yield s"example"
   }
 }
 
-/*
-@main
-def ExperimentalApp(): Unit =
-  val x = IO(10)
-  println(x)
-  println("Starting ExperimentalApp...")
-
-  run {
-    renderOnDomContentLoaded(
-      appContainer,
-      div(
-        width := "100%",
-        height := "100%",
-        Menu.view,
-        Page.view
-      )
-    )
-    // test.runSync()
-    "example"
-  }
- */
