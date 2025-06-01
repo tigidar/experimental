@@ -13,5 +13,35 @@
     "group": "io.getkyo",
     "artifact": "kyo-core",
     "version": "0.19.0"
+  },
+  {
+    "group": "io.getkyo",
+    "artifact": "kyo-core",
+    "version": "0.19.0"
+  },
+  {
+    "group": "io.getkyo",
+    "artifact": "kyo-prelude",
+    "version": "0.19.0"
+  },
+  {
+    "group": "io.getkyo",
+    "artifact": "kyo-direct",
+    "version": "0.19.0"
+  },
+  {
+    "group": "io.getkyo",
+    "artifact": "kyo-combinators",
+    "version": "0.19.0"
+  },
+  {
+    "group": "io.getkyo",
+    "artifact": "kyo-sttp",
+    "version": "0.19.0"
+  },
+  {
+    "group": "io.getkyo",
+    "artifact": "kyo-data",
+    "version": "0.19.0"
   }
 ]

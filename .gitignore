@@ -6,6 +6,7 @@ project/metals*
 
 .bsp/
 .metals/
+.bloop
 
 # Logs
 logs
