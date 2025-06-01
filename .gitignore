@@ -1,6 +1,9 @@
 # Scala outputs
 target/
 
+project/
+project/metals*
+
 .bsp/
 .metals/
 
