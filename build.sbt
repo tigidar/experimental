@@ -13,7 +13,9 @@ lazy val fronted = project
         val org = v("group").str
         val art = v("artifact").str
         val ver = v("version").str
-        val dep0 = org %% art % ver
+        //val art0 = s"${art}_${scalaVersion.value.takeWhile(_ != '.')}"
+
+        val dep0 = org %%% art % ver
         v.obj.get("scope").fold(dep0)(s => dep0 % s.str)
       }.toSeq
     },
