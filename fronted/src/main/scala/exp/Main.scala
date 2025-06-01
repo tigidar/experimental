@@ -42,14 +42,30 @@ object Page:
       }
     )
 
-object ExperimentalApp extends KyoApp:
-
+object ExperimentalApp extends KyoApp {
 
   val test: Unit < 10 =
-      IO(println(42))
+    IO(println(42))
 
-//@main
+  def app2 =  {
+        for
+            _            <- Console.printLine(s"Main args: $args")
+            currentTime  <- Clock.now
+            _            <- Console.printLine(s"Current time is: $currentTime")
+            randomNumber <- Random.nextInt(100)
+            _            <- Console.printLine(s"Generated random number: $randomNumber")
+        yield
+        // The produced value can be of any type and is
+        // automatically printed to the console.
+        "example"
+    }
+
   run {
+    "example"
+  }
+//@main
+
+  /*run {
     /*
     renderOnDomContentLoaded(
       appContainer,
@@ -59,8 +75,9 @@ object ExperimentalApp extends KyoApp:
         Menu.view,
         Page.view
       )
-    )
-     */
-      //test.runSync()
-      "example"
+    )*/
+    // test.runSync()
+    "example"
   }
+  */
+}
