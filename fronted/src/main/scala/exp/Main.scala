@@ -42,31 +42,41 @@ object Page:
       }
     )
 
+def renderDom() =
+  println("Starting ExperimentalApp in IO ...")
+  renderOnDomContentLoaded(
+    appContainer,
+    div(
+      width := "100%",
+      height := "100%",
+      Menu.view,
+      Page.view
+    )
+  )
+  println("container rendered")
+  10
+
 object ExperimentalApp extends KyoApp {
 
   val test: Unit < 10 =
     IO(println(42))
 
-  def app2 =  {
-        for
-            _            <- Console.printLine(s"Main args: $args")
-            currentTime  <- Clock.now
-            _            <- Console.printLine(s"Current time is: $currentTime")
-            randomNumber <- Random.nextInt(100)
-            _            <- Console.printLine(s"Generated random number: $randomNumber")
-        yield
-        // The produced value can be of any type and is
-        // automatically printed to the console.
-        "example"
-    }
+  run {
+    for 
+      _ <- Console.printLine("hello world")
+      _ <- IO(renderDom())
+    yield "example"
+  }
+}
+
+/*
+@main
+def ExperimentalApp(): Unit =
+  val x = IO(10)
+  println(x)
+  println("Starting ExperimentalApp...")
 
   run {
-    "example"
-  }
-//@main
-
-  /*run {
-    /*
     renderOnDomContentLoaded(
       appContainer,
       div(
@@ -75,9 +85,8 @@ object ExperimentalApp extends KyoApp {
         Menu.view,
         Page.view
       )
-    )*/
+    )
     // test.runSync()
     "example"
   }
-  */
-}
+ */
