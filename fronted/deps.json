@@ -5,6 +5,16 @@
     "version": "0.4.2"
   },
   {
+    "group": "com.softwaremill.sttp.tapir",
+    "artifact": "tapir-core",
+    "version": "1.11.34"
+  },
+  {
+    "group": "com.softwaremill.sttp.tapir",
+    "artifact": "tapir-sttp-stub4-server",
+    "version": "1.11.34"
+  },
+  {
     "group": "co.fs2",
     "artifact": "fs2-core",
     "version": "3.12.0"
