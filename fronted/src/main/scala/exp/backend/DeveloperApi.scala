@@ -8,4 +8,3 @@ object DeveloperApi:
     new Api:
       def getTodos(): Seq[String] < IO = IO(Seq("Todo 1", "Todo 2", "Todo 3"))
   }
-
