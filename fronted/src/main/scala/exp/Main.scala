@@ -1,46 +1,30 @@
 package exp
 
-import exp.view.TodoPage
-import exp.events.{PageEvent, Events}
 import kyo.*
-import exp.backend.{Api, DeveloperApi}
 import com.raquo.laminar.api.L
 import com.raquo.laminar.api.L.{*, given}
 import org.scalajs.dom
+
+import exp.backend.{Api, DeveloperApi}
+import exp.view.components.{Menu, Page}
+import exp.events.{Events, PageEvent }
 
 lazy val appContainer =
   dom.document.getElementById(
     "app"
   )
 
-object Menu:
-
-  def view: HtmlElement =
-    div(
-      width := "100%",
-      height := "50px",
-      button(
-        "Home",
-        onClick --> { (e: dom.MouseEvent) => Events.page.emit(PageEvent.Home) }
-      ),
-      button(
-        "Todo",
-        onClick --> { _ => Events.page.emit(PageEvent.Todo) }
-      )
-    )
-
-object Page:
-  def view(api: Api): HtmlElement =
-    div(
-      width := "100%",
-      height := "100%",
-      child <-- Events.page.events.toSignal(PageEvent.Todo).map {
-        case PageEvent.Home => h1("Welcome to the Home Page!")
-        case PageEvent.Todo => TodoPage(api).render()
-      }
-    )
 
 def renderDom(): Unit < (Env[Api] & IO) =
+
+  def pageEventObserver(api: Api): L.Observer[PageEvent] = Observer {
+    //event => exp.events.Events.page.writer.onNext(event)
+    case PageEvent.Todo =>
+      //TODO: Fetch todos from the API and update the state
+      println("todo")
+    case _ =>
+  }
+
   for
     api <- Env.get[Api]
     _ <- IO(
@@ -50,7 +34,8 @@ def renderDom(): Unit < (Env[Api] & IO) =
           width := "100%",
           height := "100%",
           Menu.view,
-          Page.view(api)
+          Page.view(),
+          Events.page.events --> pageEventObserver(api),
         )
       )
     )
