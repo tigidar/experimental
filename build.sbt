@@ -19,7 +19,7 @@ lazy val fronted = project
         v.obj.get("scope").fold(dep0)(s => dep0 % s.str)
       }.toSeq
     },
-    scalaVersion := "3.7.0",
+    scalaVersion := "3.7.1",
 
     // Tell Scala.js that this is an application with a main method
     scalaJSUseMainModuleInitializer := true,
