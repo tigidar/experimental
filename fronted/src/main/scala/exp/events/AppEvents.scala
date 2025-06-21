@@ -10,6 +10,12 @@ enum PageEvent:
 
 final case class TodoItem(id: String, title: String, description: String)
 
+enum DataEvent:
+  case FetchTodos
+  case Todos(todos: IndexedSeq[TodoItem])
+  case Error(message: String)
+  case Empty
+
 object Events:
 
   /*
@@ -18,11 +24,24 @@ object Events:
       (todo: String, index: Int) =>
         TodoItem(s"todo-$index", todo, s"This is a description for $todo")
     })
-  */
+   */
 
   val page = new L.EventBus[PageEvent]()
+  val pageRx = page.events.toSignal(PageEvent.Todo)
 
-  val todos: L.EventBus[IndexedSeq[TodoItem]] =
-    new L.EventBus[IndexedSeq[TodoItem]]()
+  val data = new L.EventBus[DataEvent]()
 
+  val dataRx: L.Signal[DataEvent] =
+    data.events.toSignal(DataEvent.Empty)
+
+  val todosRx: L.Signal[IndexedSeq[TodoItem]] =
+    data.events.tapEach( d =>
+      println(d)
+    ).scanLeft(IndexedSeq.empty[TodoItem]) { (acc, event) =>
+      event match
+        case DataEvent.Todos(todos) => 
+          println("something happens here ?")
+          todos
+        case _                      => acc
+    }
 

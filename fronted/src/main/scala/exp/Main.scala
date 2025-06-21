@@ -7,24 +7,35 @@ import org.scalajs.dom
 
 import exp.backend.{Api, DeveloperApi}
 import exp.view.components.{Menu, Page}
-import exp.events.{Events, PageEvent }
+import exp.events.{Events, DataEvent, PageEvent}
 
 lazy val appContainer =
   dom.document.getElementById(
     "app"
   )
 
+def pageEventObserver(api: Api): L.Observer[PageEvent] = Observer {
+  // event => exp.events.Events.page.writer.onNext(event)
+  case PageEvent.Todo =>
+    // TODO: Fetch todos from the API and update the state
+    println("todo")
+  case _ =>
+}
+
+def dataObserver(api: Api): L.Observer[DataEvent] = Observer {
+  case DataEvent.Todos(todos) =>
+    println(s"Fetched todos: ${todos.map(_.title).mkString(", ")}")
+  case DataEvent.Error(message) =>
+    println(s"Error fetching todos: $message")
+  case DataEvent.Empty =>
+    println("No todos available.")
+  case DataEvent.FetchTodos =>
+    println("Fetching todos...")
+    val todos = api.getTodos()
+    Events.data.emit(DataEvent.Todos(todos))
+}
 
 def renderDom(): Unit < (Env[Api] & IO) =
-
-  def pageEventObserver(api: Api): L.Observer[PageEvent] = Observer {
-    //event => exp.events.Events.page.writer.onNext(event)
-    case PageEvent.Todo =>
-      //TODO: Fetch todos from the API and update the state
-      println("todo")
-    case _ =>
-  }
-
   for
     api <- Env.get[Api]
     _ <- IO(
@@ -33,9 +44,10 @@ def renderDom(): Unit < (Env[Api] & IO) =
         div(
           width := "100%",
           height := "100%",
-          Menu.view,
-          Page.view(),
           Events.page.events --> pageEventObserver(api),
+          Events.data.events --> dataObserver(api),
+          Menu.view,
+          Page.view()
         )
       )
     )

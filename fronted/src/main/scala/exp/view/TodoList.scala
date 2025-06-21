@@ -3,7 +3,7 @@ package exp.view
 import exp.backend.Api
 import com.raquo.laminar.api.L
 import com.raquo.laminar.api.L.{*, given}
-import exp.events.Events.todos
+import exp.events.{Events, DataEvent}
 import exp.events.TodoItem
 
 def todoItemComponent(todo: L.Signal[TodoItem]): HtmlElement =
@@ -16,9 +16,7 @@ def todoItemComponent(todo: L.Signal[TodoItem]): HtmlElement =
 
 final case class TodoPage():
 
-  val todosRx = todos.events.toSignal(IndexedSeq.empty)
-
-  val todoChildRx = todosRx.split(
+  val todoChildRx = Events.todosRx.split(
     _.id
   ) { (id, todo, todoSignal) =>
     todoItemComponent(
@@ -27,5 +25,6 @@ final case class TodoPage():
   }
 
   def render() =
-    div(h1("Todo List"), children <-- todoChildRx)
-
+    div(h1("Todo List"), children <-- todoChildRx,
+      onMountCallback(_ => Events.data.emit(DataEvent.FetchTodos)),
+    )

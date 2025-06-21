@@ -8,15 +8,14 @@ import exp.view.TodoPage
 import exp.events.{PageEvent, Events}
 import exp.backend.{Api, DeveloperApi}
 
-object Page:
 
-  val pageRx = Events.page.events.toSignal(PageEvent.Todo)
+object Page:
 
   def view(): HtmlElement =
     div(
       width := "100%",
       height := "100%",
-      child <-- pageRx.map {
+      child <-- Events.pageRx.map {
         case PageEvent.Home => h1("Welcome to the Home Page!")
         case PageEvent.Todo => TodoPage().render()
       }

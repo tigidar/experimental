@@ -1,7 +1,8 @@
 package exp.backend
 
 import kyo.*
+import exp.events.TodoItem
 
 trait Api:
 
-  def getTodos(): Seq[String] < IO
+  def getTodos(): IndexedSeq[TodoItem]
