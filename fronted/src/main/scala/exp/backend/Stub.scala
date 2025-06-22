@@ -10,12 +10,6 @@ import exp.client.Client
 import sttp.tapir.server.stub4.TapirStubInterpreter
 import scala.concurrent.Future
 
-// Don't need this as of yet, only if we want to test special incidents like errors, etc.
-//import sttp.tapir.server.stub4.TapirStubInterpreter
-
-// Not sure if this exists
-//import sttp.client4.scalajs.FetchFetchBackend
-
 object Stub:
 
   given executionContext: scala.concurrent.ExecutionContext =

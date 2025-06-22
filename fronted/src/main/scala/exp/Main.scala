@@ -5,7 +5,7 @@ import com.raquo.laminar.api.L
 import com.raquo.laminar.api.L.{*, given}
 import org.scalajs.dom
 import sttp.client4.{Response}
-import exp.api.{Api, DeveloperApi}
+import exp.api.{Api, ServerStubApi, ServerApi}
 import exp.view.components.{Menu, Page}
 import exp.events.{Events, DataEvent, PageEvent}
 import exp.client.Client
@@ -14,16 +14,22 @@ import exp.model.TodoItem
 import scala.concurrent.Future
 import sttp.tapir.DecodeResult
 import sttp.tapir.DecodeResult.Missing
+import exp.client.ClientBackend
+import exp.client.StubBackend
 
 given executionContext: scala.concurrent.ExecutionContext =
-    scala.concurrent.ExecutionContext.global
+   scala.concurrent.ExecutionContext.global
+
+extension [A](fa: Future[A])
+  def emit[B](f: A => DataEvent): Unit =
+    fa.map(f).foreach{ d => Events.data.emit(d)}
 
 lazy val appContainer =
   dom.document.getElementById(
     "app"
   )
 
-def pageEventObserver(api: Api): L.Observer[PageEvent] = Observer {
+def pageEventObserver(api: ServerApi): L.Observer[PageEvent] = Observer {
   // event => exp.events.Events.page.writer.onNext(event)
   case PageEvent.Todo =>
     // TODO: Fetch todos from the API and update the state
@@ -34,39 +40,29 @@ def pageEventObserver(api: Api): L.Observer[PageEvent] = Observer {
 def decodeOrFail[E, O](res: Response[DecodeResult[Either[E, O]]]): Future[O] =
   res.body match {
     case DecodeResult.Value(Right(value)) => Future.successful(value)
-    case DecodeResult.Value(Left(error))  => Future.failed(new Exception(s"Error: $error"))
-    case Missing =>
-      Future.failed(new Exception("Missing data in response"))
-    //case DecodeResult.Failure(_, _, e)    => Future.failed(e)
+    case DecodeResult.Value(Left(error)) =>
+      Future.failed(new Exception(s"Error: $error"))
+    case _ =>
+      Future.failed(
+        new Exception("Unexpected response format")
+      )
   }
 
-
-def dataObserver(api: Api): L.Observer[DataEvent] = Observer {
+def dataObserver(api: ServerApi): L.Observer[DataEvent] = Observer {
   case DataEvent.Todos(todos) =>
-    //println(s"Fetched todos: ${todos.map(_.title).mkString(", ")}")
+  // println(s"Fetched todos: ${todos.map(_.title).mkString(", ")}")
   case DataEvent.Error(message) =>
-    //println(s"Error fetching todos: $message")
+  // println(s"Error fetching todos: $message")
   case DataEvent.Empty =>
-    //println("No todos available.")
+  // println("No todos available.")
   case DataEvent.FetchTodos =>
-    val f: Future[IndexedSeq[TodoItem]] = Client.request.send(Stub.backend).flatMap(
-      decodeOrFail)
-
-    L.Signal.fromFuture[IndexedSeq[TodoItem]](f).map { response =>
-      response match {
-        case Some(todos) =>
-          println(s"Fetched todos via the backend thingy: ${todos.map(_.title).mkString(", ")}")
-          Events.data.emit(DataEvent.Todos(todos.asInstanceOf[IndexedSeq[TodoItem]]))
-        case None =>
-          Events.data.emit(DataEvent.Error("failed to fetch todos"))
-      }
-    }.foreach(_ => ())(using unsafeWindowOwner)
-
+    api.getTodos().emit(DataEvent.Todos.apply)
 }
 
-def renderDom(): Unit < (Env[Api] & IO) =
+def renderDom(): Unit < (Env[ClientBackend[Future]] & IO) =
   for
-    api <- Env.get[Api]
+    clientBackend <- Env.get[ClientBackend[Future]]
+    api = ServerApi(clientBackend.get())
     _ <- IO(
       render(
         appContainer,
@@ -85,7 +81,7 @@ def renderDom(): Unit < (Env[Api] & IO) =
 object ExperimentalApp extends KyoApp {
 
   lazy val startApp: Unit < IO =
-    Memo.run(Env.runLayer(DeveloperApi.backendApiLayer)(renderDom()))
+    Memo.run(Env.runLayer(StubBackend.backendLayer)(renderDom()))
 
   run {
     for _ <- startApp

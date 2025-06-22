@@ -6,7 +6,7 @@ import com.raquo.laminar.api.L.{*, given}
 
 import exp.view.TodoPage
 import exp.events.{PageEvent, Events}
-import exp.api.{Api, DeveloperApi}
+import exp.api.{Api, ServerStubApi}
 
 object Page:
 

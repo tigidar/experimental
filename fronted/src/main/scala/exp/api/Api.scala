@@ -2,7 +2,9 @@ package exp.api
 
 import kyo.*
 import exp.model.TodoItem
+import scala.concurrent.Future
 
-trait Api:
+trait Api[F[_]]:
 
-  def getTodos(): IndexedSeq[TodoItem]
+  def getTodos(): F[IndexedSeq[TodoItem]]
+

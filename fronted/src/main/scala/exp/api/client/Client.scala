@@ -16,7 +16,6 @@ object Client:
   val baseUri = uri"http://localhost:8080" // your real or stub base
   val interpreter = SttpClientInterpreter()
 
-  // Construct the request
   val request =
     interpreter.toRequest(Endpoints.fetchTodos, Some(baseUri)).apply(())
 
