@@ -1,14 +1,13 @@
 package exp.events
 
+import exp.model.TodoItem
 import kyo.*
-
 import com.raquo.laminar.api.L
 
 enum PageEvent:
   case Home
   case Todo
 
-final case class TodoItem(id: String, title: String, description: String)
 
 enum DataEvent:
   case FetchTodos

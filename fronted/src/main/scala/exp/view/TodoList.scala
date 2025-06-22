@@ -1,10 +1,10 @@
 package exp.view
 
-import exp.backend.Api
+import exp.api.Api
 import com.raquo.laminar.api.L
 import com.raquo.laminar.api.L.{*, given}
 import exp.events.{Events, DataEvent}
-import exp.events.TodoItem
+import exp.model.TodoItem
 
 def todoItemComponent(todo: L.Signal[TodoItem]): HtmlElement =
   div(
@@ -28,3 +28,4 @@ final case class TodoPage():
     div(h1("Todo List"), children <-- todoChildRx,
       onMountCallback(_ => Events.data.emit(DataEvent.FetchTodos)),
     )
+

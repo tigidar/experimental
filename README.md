@@ -28,7 +28,7 @@ The endpoints should be shared between the frontend and the backend, and then we
 
 ## TODOS
 
-1. Implement the TODO api for fetching todos with a mocked tapir backing using sttp.
+1. Implement the TODO api for fetching todos with a mocked tapir backend using sttp.
 2. Integrate kyo Env and Layer to be able to easily create fakes that also can be utilized during development cycle.
 3. See if we can do some test miracle as well with this
 

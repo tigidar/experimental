@@ -1,7 +1,7 @@
-package exp.backend
+package exp.api
 
 import kyo.*
-import exp.events.TodoItem
+import exp.model.TodoItem
 
 object DeveloperApi:
 
@@ -13,3 +13,4 @@ object DeveloperApi:
             TodoItem(s"todo-$index", todo, s"This is a description for $todo")
         }
   }
+

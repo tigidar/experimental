@@ -6,8 +6,7 @@ import com.raquo.laminar.api.L.{*, given}
 
 import exp.view.TodoPage
 import exp.events.{PageEvent, Events}
-import exp.backend.{Api, DeveloperApi}
-
+import exp.api.{Api, DeveloperApi}
 
 object Page:
 
@@ -20,3 +19,4 @@ object Page:
         case PageEvent.Todo => TodoPage().render()
       }
     )
+

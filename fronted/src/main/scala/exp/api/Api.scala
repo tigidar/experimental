@@ -1,7 +1,7 @@
-package exp.backend
+package exp.api
 
 import kyo.*
-import exp.events.TodoItem
+import exp.model.TodoItem
 
 trait Api:
 
