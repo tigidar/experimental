@@ -1,47 +1,37 @@
 package exp.events
 
+import exp.model.Ticket
 import kyo.*
-
 import com.raquo.laminar.api.L
 
 enum PageEvent:
   case Home
-  case Todo
-
-final case class TodoItem(id: String, title: String, description: String)
+  case TicketList
+  case TicketEdit(ticket: Ticket)
 
 enum DataEvent:
-  case FetchTodos
-  case Todos(todos: IndexedSeq[TodoItem])
+  case FetchTickets
+  case Tickets(todos: IndexedSeq[Ticket])
   case Error(message: String)
   case Empty
 
 object Events:
 
-  /*
-  val getTodos: L.Var[IndexedSeq[TodoItem]] =
-    L.Var(IndexedSeq[String]("Todo 1", "Todo 2", "Todo 3").zipWithIndex.map {
-      (todo: String, index: Int) =>
-        TodoItem(s"todo-$index", todo, s"This is a description for $todo")
-    })
-   */
-
   val page = new L.EventBus[PageEvent]()
-  val pageRx = page.events.toSignal(PageEvent.Todo)
+  val pageRx = page.events.toSignal(PageEvent.TicketList)
 
   val data = new L.EventBus[DataEvent]()
 
   val dataRx: L.Signal[DataEvent] =
     data.events.toSignal(DataEvent.Empty)
 
-  val todosRx: L.Signal[IndexedSeq[TodoItem]] =
-    data.events.tapEach( d =>
-      println(d)
-    ).scanLeft(IndexedSeq.empty[TodoItem]) { (acc, event) =>
+  val ticketsOnly: (IndexedSeq[Ticket], DataEvent) => IndexedSeq[Ticket] = {
+    (acc, event) =>
       event match
-        case DataEvent.Todos(todos) => 
-          println("something happens here ?")
-          todos
-        case _                      => acc
-    }
+        case DataEvent.Tickets(tickets) => tickets
+        case _ => acc
+  }
+
+  val ticketsRx: L.Signal[IndexedSeq[Ticket]] =
+    data.events.scanLeft(IndexedSeq.empty[Ticket])(ticketsOnly)
 
