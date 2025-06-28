@@ -8,7 +8,7 @@ import sttp.tapir.json.upickle.*
 import upickle.default.*
 import sttp.tapir.generic.auto.*
 
-import exp.model.TodoItem
+import exp.model.Ticket
 import exp.api.Endpoints
 
 object Client:
@@ -16,6 +16,6 @@ object Client:
   val baseUri = uri"http://localhost:8080" // your real or stub base
   val interpreter = SttpClientInterpreter()
 
-  val request =
-    interpreter.toRequest(Endpoints.fetchTodos, Some(baseUri)).apply(())
+  def getTickets() =
+    interpreter.toRequest(Endpoints.getTickets(), Some(baseUri)).apply(())
 

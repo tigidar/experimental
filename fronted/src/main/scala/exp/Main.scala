@@ -5,12 +5,12 @@ import com.raquo.laminar.api.L
 import com.raquo.laminar.api.L.{*, given}
 import org.scalajs.dom
 import sttp.client4.{Response}
-import exp.api.{Api, ServerStubApi, ServerApi}
+import exp.api.{Api, ServerApi}
 import exp.view.components.{Menu, Page}
 import exp.events.{Events, DataEvent, PageEvent}
 import exp.client.Client
 import exp.backend.Stub
-import exp.model.TodoItem
+import exp.model.Ticket
 import scala.concurrent.Future
 import sttp.tapir.DecodeResult
 import sttp.tapir.DecodeResult.Missing
@@ -31,7 +31,7 @@ lazy val appContainer =
 
 def pageEventObserver(api: ServerApi): L.Observer[PageEvent] = Observer {
   // event => exp.events.Events.page.writer.onNext(event)
-  case PageEvent.Todo =>
+  case PageEvent.TicketList =>
     // TODO: Fetch todos from the API and update the state
     println("todo")
   case _ =>
@@ -49,14 +49,14 @@ def decodeOrFail[E, O](res: Response[DecodeResult[Either[E, O]]]): Future[O] =
   }
 
 def dataObserver(api: ServerApi): L.Observer[DataEvent] = Observer {
-  case DataEvent.Todos(todos) =>
+  case DataEvent.Tickets(todos) =>
   // println(s"Fetched todos: ${todos.map(_.title).mkString(", ")}")
   case DataEvent.Error(message) =>
   // println(s"Error fetching todos: $message")
   case DataEvent.Empty =>
   // println("No todos available.")
-  case DataEvent.FetchTodos =>
-    api.getTodos().emit(DataEvent.Todos.apply)
+  case DataEvent.FetchTickets =>
+    api.getTickets().emit(DataEvent.Tickets.apply)
 }
 
 def renderDom(): Unit < (Env[ClientBackend[Future]] & IO) =
@@ -78,13 +78,24 @@ def renderDom(): Unit < (Env[ClientBackend[Future]] & IO) =
     )
   yield ()
 
+
+
 object ExperimentalApp extends KyoApp {
+
+  val editPage = PageEvent.TicketEdit(Ticket(
+        "ticket-id",
+        "Ticket title",
+        "Ticket description"
+      ))
+
+  val listPage = PageEvent.TicketList
 
   lazy val startApp: Unit < IO =
     Memo.run(Env.runLayer(StubBackend.backendLayer)(renderDom()))
 
   run {
     for _ <- startApp
+    _ <- IO(Events.page.emit(listPage))
     yield ()
   }
 

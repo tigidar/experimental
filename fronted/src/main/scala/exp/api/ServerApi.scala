@@ -2,7 +2,7 @@ package exp.api
 
 import kyo.*
 import sttp.client4.{Response}
-import exp.model.TodoItem
+import exp.model.Ticket
 import scala.concurrent.Future
 import exp.client.Client
 import exp.backend.Stub
@@ -17,6 +17,6 @@ given executionContext: scala.concurrent.ExecutionContext =
 
 final case class ServerApi(backend: Backend[Future]):
 
-  def getTodos(): Future[IndexedSeq[TodoItem]] =
-    Client.request.send(backend).flatMap(RequestDecoder.apply)
+  def getTickets(): Future[IndexedSeq[Ticket]] =
+    Client.getTickets().send(backend).flatMap(RequestDecoder.apply)
 
