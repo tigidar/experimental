@@ -7,12 +7,22 @@ We want to test out:
 - Laminar and Kyo integration
 - tapir and sttp using the scalajs stub server to mock frontend work.
 
-To start development, first start sbt, then
+## Development
+
+The development environment use `sbt` and in the future `mill` scala build system and `vite` for frontend development.
+
+### Scala build
+
+To start development, first start sbt, then compile the frontend via fastLinkJS:
 
 ```bash
 sbt # Start sbt shell
 ~frontend/fastLinkJS # Start frontend fastLinkJS task that compiles
 ```
+
+You have to connect to the sbt language server, because we have factored out the dependencies into a json file, `deps.json`. This is also experimental, since we want to combine `mill` and `sbt` in the end.
+
+### frontend build (vite)
 
 Then you can start vite:
 
