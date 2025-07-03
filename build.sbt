@@ -3,7 +3,7 @@ import ujson.Value
 
 lazy val externalDepsJs = settingKey[Seq[ModuleID]]("deps.json → ModuleID list")
 
-lazy val fronted = project
+lazy val frontend = project
   .enablePlugins(ScalaJSPlugin) // Enable the Scala.js plugin in this project
   .settings(
     externalDepsJs := {
@@ -56,6 +56,16 @@ lazy val fronted = project
     libraryDependencies ++= externalDepsJs.value
   )
 
+lazy val model = project
+  .settings(
+    scalaVersion := "3.7.1",
+    libraryDependencies ++= Seq(
+      // Add any libraries you need for your domain model
+      "com.lihaoyi" %% "ujson" % "3.1.3"
+    )
+  )
+
+
 lazy val root = project
   .in(file("."))
-  .aggregate(fronted)
+  .aggregate(frontend, model)
