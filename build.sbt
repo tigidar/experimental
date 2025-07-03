@@ -3,6 +3,7 @@ import ujson.Value
 
 lazy val externalDepsJs = settingKey[Seq[ModuleID]]("deps.json → ModuleID list")
 
+/*
 lazy val frontend = project
   .enablePlugins(ScalaJSPlugin) // Enable the Scala.js plugin in this project
   .settings(
@@ -53,18 +54,20 @@ lazy val frontend = project
       // Testing framework
       "org.scalameta" %%% "munit" % "1.1.0" % Test,
 
-      "com.lihaoyi" %%% "ujson" % "3.1.3",
+      "com.lihaoyi" %%% "ujson" % "4.2.1",
 
     ),
     libraryDependencies ++= externalDepsJs.value
   ).dependsOn(model)
+*/
 
 lazy val model = project
   .settings(
     scalaVersion := "3.7.1",
     libraryDependencies ++= Seq(
+    "com.softwaremill.sttp.tapir" %% "tapir-json-upickle" % "1.11.34"
       // Add any libraries you need for your domain model
-      "com.lihaoyi" %% "ujson" % "3.1.3"
+      //"com.lihaoyi" %% "ujson" % "4.2.1"
     )
   )
 
@@ -73,11 +76,15 @@ lazy val endpoints = project
     scalaVersion := "3.7.1",
     libraryDependencies ++= Seq(
       // Add any libraries you need for your domain model
-      "com.lihaoyi" %% "ujson" % "3.1.3"
+//      "com.lihaoyi" %% "ujson" % "4.2.1",
+    "com.softwaremill.sttp.tapir" %% "tapir-core" % "1.11.34",
+    "com.softwaremill.sttp.tapir" %% "tapir-json-upickle" % "1.11.34"
     )
-  )
+  ).dependsOn(model)
 
 lazy val root = project
   .in(file("."))
-  .aggregate(frontend, model)
+  .aggregate(model, endpoints)
+
+//frontend, 
 
