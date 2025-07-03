@@ -51,10 +51,13 @@ lazy val frontend = project
       "com.indoorvivants" %%% "scala-uri" % "4.1.0",
       "com.softwaremill.sttp.client4" %%% "core" % "4.0.0",
       // Testing framework
-      "org.scalameta" %%% "munit" % "1.1.0" % Test
+      "org.scalameta" %%% "munit" % "1.1.0" % Test,
+
+      "com.lihaoyi" %%% "ujson" % "3.1.3",
+
     ),
     libraryDependencies ++= externalDepsJs.value
-  )
+  ).dependsOn(model)
 
 lazy val model = project
   .settings(
