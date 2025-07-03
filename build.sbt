@@ -68,7 +68,16 @@ lazy val model = project
     )
   )
 
+lazy val endpoints = project
+  .settings(
+    scalaVersion := "3.7.1",
+    libraryDependencies ++= Seq(
+      // Add any libraries you need for your domain model
+      "com.lihaoyi" %% "ujson" % "3.1.3"
+    )
+  )
 
 lazy val root = project
   .in(file("."))
   .aggregate(frontend, model)
+
