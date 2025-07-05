@@ -38,16 +38,19 @@ The endpoints should be shared between the frontend and the backend, and then we
 
 ## TODOS
 
-1. See if there are ways to write unit tests etc.
-2. Fix event model so it works according to the domain
-3. Implement simple crud
-4. Are there any magical things we can use from kyo for a simple backend?
-5. Try to integrate kyo?
+0. Ensure common build settings / scala version on all modules
+1. Add server setup
+2. Domain cleanup
+3. See if there are ways to write unit tests etc.
+4. Fix event model so it works according to the domain
+5. Implement simple crud
+6. Are there any magical things we can use from kyo for a simple backend?
+
 
 ## Done
 
 - modularize, putting common code in modules available for frontend and backend
+- Kyo is integrated with frontend as a PoC
 - Implement the TODO api for fetching todos with a mocked tapir backend using sttp.
 - Clean up everything, make boundary contexts
 - Integrate kyo Env and Layer to be able to easily create fakes that also can be utilized during development cycle.
-
