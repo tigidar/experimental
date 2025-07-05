@@ -5,11 +5,11 @@ import sttp.tapir.server.ServerEndpoint
 
 import exp.model.Ticket
 import sttp.tapir.*
-import sttp.tapir.json.upickle.*
-import upickle.default.*
-import sttp.tapir.generic.auto.*
+import sttp.tapir.json.pickler.*
 
 object Endpoints:
+
+  given Pickler[Ticket] = Pickler.derived[Ticket]
 
   def getTickets() : Endpoint[Unit, Unit, String, IndexedSeq[Ticket], Any] =
     endpoint.get

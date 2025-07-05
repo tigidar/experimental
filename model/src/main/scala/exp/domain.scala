@@ -1,18 +1,10 @@
 package exp
 
-import upickle.default.{ReadWriter, macroRW}
 import java.time.Instant
 import java.util.UUID
 
 enum Priority:
     case Low, Medium, High
-
-import upickle.*
-
-given ReadWriter[Instant] = new ReadWriter[String]{}.bimap[Instant](
-    instant => instant.toString,                      // serialize as ISO string
-    str => Instant.parse(str)                         // parse ISO string back
-  )
 
 final case class TicketInfo(
       title: String
@@ -29,10 +21,6 @@ final case class UserInfo(
         , email: EmailAddress
 )
 
-object UserInfo:
-
-  given rw: ReadWriter[UserInfo] = macroRW[UserInfo]
-
 enum User:
     case Assignee(
         info: UserInfo
@@ -40,13 +28,6 @@ enum User:
     case Reporter(
         info: UserInfo
     )
-
-object User:
-
- given rw: ReadWriter[User] = macroRW[User]
- // given rw: ReadWriter[Assignee] = macroRW[Assignee]
- // given rw: ReadWriter[Reporter] = macroRW[Reporter]
-  
 
 final case class TicketStatusEvent(
         id: UUID
@@ -74,10 +55,6 @@ enum Justification:
         , description: String
     )
 
-object Justification:
-
-  given rw: ReadWriter[Justification] = macroRW[Justification]
-
 enum TicketCategory: 
     case Predefined(
           id: UUID
@@ -90,9 +67,6 @@ enum TicketCategory:
         , info: TicketInfo
     )
 
-object TicketCategory:
-  given rw: ReadWriter[TicketCategory] = macroRW[TicketCategory]
-
 final case class Ticket(
         id: UUID
     , category: TicketCategory
@@ -102,10 +76,6 @@ final case class Ticket(
     , updatedAt: java.time.Instant
     , justification: Justification
 )
-
-object Ticket:
-  
-  given rw: ReadWriter[Ticket] = macroRW[Ticket]
 
 final case class EmailAddress(
         localPart: String

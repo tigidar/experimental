@@ -4,9 +4,8 @@ import sttp.client4.*
 import sttp.tapir.*
 import sttp.tapir.client.sttp4.SttpClientInterpreter
 
-import sttp.tapir.json.upickle.*
-import upickle.default.*
-import sttp.tapir.generic.auto.*
+//import upickle.default.*
+//import sttp.tapir.generic.auto.*
 
 import exp.model.Ticket
 import exp.api.Endpoints
