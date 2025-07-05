@@ -27,8 +27,33 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
         cache: 'sbt'
-    - name: Run tests
+
+
+    - name: Set up sbt launcher
+      uses: sbt/setup-sbt@v1
+
+    - name: Build & test all Scala modules
       run: sbt test
+
+    - name: Compile Scala.js frontend (fast)
+      run: sbt frontend/fastLinkJS
+
+    - name: Install npm dependencies
+      run: npm ci
+
+    - name: Run Vite production build
+      working-directory: frontend
+      run: npm run build
+
+    - name: Run Vite dev server smoke test
+      working-directory: frontend
+      run: |
+        npm run dev -- --port 5173 &
+        sleep 5
+        curl --fail http://localhost:5173 || (echo "Server failed" && exit 1)
+
+      # Optional: Upload dependency graph for security scans       
+    
       # Optional: This step uploads information to the GitHub dependency graph and unblocking Dependabot alerts for the repository
     - name: Upload dependency graph
       uses: scalacenter/sbt-dependency-submission@ab086b50c947c9774b70f39fc7f6e20ca2706c91
