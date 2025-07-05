@@ -56,7 +56,7 @@ def dataObserver(api: ServerApi): L.Observer[DataEvent] = Observer {
   case DataEvent.Empty =>
   // println("No todos available.")
   case DataEvent.FetchTickets =>
-    api.getTickets.emit(DataEvent.Tickets.apply)
+    api.getTickets().emit(DataEvent.Tickets.apply)
 }
 
 def renderDom(): Unit < (Env[ClientBackend[Future]] & IO) =
@@ -77,8 +77,6 @@ def renderDom(): Unit < (Env[ClientBackend[Future]] & IO) =
       )
     )
   yield ()
-
-
 
 object ExperimentalApp extends KyoApp {
 

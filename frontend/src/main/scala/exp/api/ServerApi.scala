@@ -11,10 +11,11 @@ import sttp.tapir.DecodeResult.Missing
 import sttp.client4.Backend
 import exp.events.Events
 import exp.events.DataEvent
-import scala.concurrent.ExecutionContext 
+import scala.concurrent.ExecutionContext
 
-final case class ServerApi(backend: Backend[Future]):
+final class ServerApi(backend: Backend[Future])(using
+    exec: ExecutionContext
+) extends Api[Future]:
 
-  def getTickets(using exec: ExecutionContext): Future[IndexedSeq[Ticket]] =
+  def getTickets(): Future[IndexedSeq[Ticket]] =
     Client.getTickets().send(backend).flatMap(RequestDecoder.apply)
-

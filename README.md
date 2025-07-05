@@ -38,8 +38,6 @@ The endpoints should be shared between the frontend and the backend, and then we
 
 ## TODOS
 
-0. Ensure common build settings / scala version on all modules
-1. Move Frontend server stub out into its own module
 2. Add server setup
 3. Domain cleanup
 4. automate the formatting, most effectively within the CI pipeline, find best practices
@@ -51,8 +49,11 @@ The endpoints should be shared between the frontend and the backend, and then we
 
 ## Done
 
+- Move Frontend server stub out into its own module
+- Ensure common build settings / scala version on all modules
 - modularize, putting common code in modules available for frontend and backend
 - Kyo is integrated with frontend as a PoC
 - Implement the TODO api for fetching todos with a mocked tapir backend using sttp.
 - Clean up everything, make boundary contexts
 - Integrate kyo Env and Layer to be able to easily create fakes that also can be utilized during development cycle.
+

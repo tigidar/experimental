@@ -5,7 +5,6 @@ import sttp.client4.*
 import sttp.client4.testing.{BackendStub, SyncBackendStub}
 import sttp.tapir.server.stub4.*
 import exp.api.TicketEndpoints
-import exp.client.Client
 import sttp.tapir.server.stub4.TapirStubInterpreter
 import scala.concurrent.Future
 import exp.api.TicketEndpoints

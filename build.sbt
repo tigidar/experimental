@@ -1,6 +1,10 @@
 import org.scalajs.linker.interface.ModuleSplitStyle
 import org.scalajs.jsenv.nodejs.*
+import org.typelevel.scalacoptions.ScalacOption
+import org.typelevel.scalacoptions.ScalacOptions
+import org.typelevel.scalacoptions.ScalaVersion
 
+lazy val scalaVersionDef = "3.7.1"
 lazy val tapirVersion = "1.11.35"
 lazy val kyoVersion = "0.19.0"
 lazy val sourcecodeVersion = "0.4.2"
@@ -10,6 +14,29 @@ lazy val scalaJavaTimeVersion = "2.6.0"
 lazy val scalaJsDomVersion = "2.8.0"
 lazy val scalaUriVersion = "4.1.0"
 lazy val laminarVersion = "17.2.1"
+
+val compilerOptionFailDiscard =
+  "-Wconf:msg=(unused.*value|discarded.*value|pure.*statement):error"
+
+val compilerOptions = Set(
+  ScalacOptions.encoding("utf8"),
+  ScalacOptions.feature,
+  ScalacOptions.unchecked,
+  ScalacOptions.deprecation,
+  ScalacOptions.warnValueDiscard,
+  ScalacOptions.warnNonUnitStatement,
+  ScalacOptions.languageStrictEquality,
+  ScalacOptions.release("11"),
+  ScalacOptions.advancedKindProjector
+)
+
+def scalacOptionToken(proposedScalacOption: ScalacOption) =
+  scalacOptionTokens(Set(proposedScalacOption))
+
+def scalacOptionTokens(proposedScalacOptions: Set[ScalacOption]) = Def.setting {
+  val version = ScalaVersion.fromString(scalaVersionDef).right.get
+  ScalacOptions.tokensForVersion(version, proposedScalacOptions)
+}
 
 def ^(deps: ModuleID*) =
   deps.toSeq
@@ -33,13 +60,14 @@ lazy val supportLibs = ^(
   "io.github.cquiroz" %% "scala-java-time" % scalaJavaTimeVersion
 )
 
-lazy val frontendLibs = Def.setting(Seq(
-  "org.scala-js" %%% "scalajs-dom" % scalaJsDomVersion,
-  "com.raquo" %%% "laminar" % laminarVersion,
-  "com.indoorvivants" %%% "scala-uri" % scalaUriVersion,
-  "com.softwaremill.sttp.tapir" %%% "tapir-sttp-stub4-server" % tapirVersion,
-  "org.scalameta" %%% "munit" % "1.1.0" % Test,
-))
+lazy val frontendLibs = Def.setting(
+  Seq(
+    "org.scala-js" %%% "scalajs-dom" % scalaJsDomVersion,
+    "com.raquo" %%% "laminar" % laminarVersion,
+    "com.indoorvivants" %%% "scala-uri" % scalaUriVersion,
+    "org.scalameta" %%% "munit" % "1.1.0" % Test
+  )
+)
 
 lazy val ioLibs = ^(
   "com.softwaremill.sttp.client4" %% "core" % sttpVersion,
@@ -66,16 +94,15 @@ lazy val kyoDepsJs = Def.setting(
 
 lazy val tapirDepsJs = Def.setting(
   Seq(
-
-    "com.softwaremill.sttp.tapir" %%% "tapir-json-pickler" % tapirVersion,
+    "com.softwaremill.sttp.client4" %%% "core" % sttpVersion,
     "com.softwaremill.sttp.tapir" %%% "tapir-json-pickler" % tapirVersion
   )
 )
 
 lazy val commonSettings = Seq(
-  scalaVersion := "3.7.1"
+  scalaVersion := scalaVersionDef,
+  scalacOptions ++= scalacOptionToken(ScalacOptions.source3).value
 )
-
 
 lazy val domain = crossProject(JVMPlatform, JSPlatform)
   .in(file("domain"))
@@ -101,15 +128,17 @@ lazy val endpoints = crossProject(JVMPlatform, JSPlatform)
   )
   .dependsOn(codecs)
 
-lazy val stubBackend = project
-  .in(file("stub-backend"))
+lazy val stubBackend = crossProject(JVMPlatform, JSPlatform)
+  .in(file("stub"))
   .settings(commonSettings)
   .settings(
     libraryDependencies ++= Seq(
-      ("org.scala-js" %%% "scalajs-java-securerandom" % "1.0.0").cross(CrossVersion.for3Use2_13),
-    )
+      "com.softwaremill.sttp.tapir" %%% "tapir-sttp-stub4-server" % tapirVersion
+      // ("org.scala-js" %%% "scalajs-java-securerandom" % "1.0.0")
+      // .cross(CrossVersion.for3Use2_13)
+    ) ++ tapirDepsJs.value
   )
-  .dependsOn(domain.jvm, endpoints.jvm)
+  .dependsOn(endpoints)
 
 lazy val frontend = project
   .enablePlugins(ScalaJSPlugin) // Enable the Scala.js plugin in this project
@@ -138,14 +167,47 @@ lazy val frontend = project
         )
     }
   )
-  .dependsOn(endpoints.js)
+  .dependsOn(endpoints.js, stubBackend.js)
 
-lazy val allCrossProjects: Seq[sbt.Project] = 
-  Seq(domain, endpoints).foldLeft(List.empty[sbt.Project])((acc,p) => acc ++ Seq(p.jvm, p.js)).toSeq
+lazy val database = project
+  .in(file("db"))
+  .settings(commonSettings)
+  .settings(
+    libraryDependencies ++= Seq(
+      "com.lihaoyi" %% "scalasql" % "0.1.20"
+    )
+  )
+
+lazy val nettyWithCats = project
+  .in(file("netty"))
+  .settings(commonSettings)
+  .settings(
+    libraryDependencies ++= Seq(
+      // if you are using cats-effect:
+      "com.softwaremill.sttp.tapir" %% "tapir-netty-server-cats" % tapirVersion,
+      "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-bundle" % tapirVersion,
+      "com.softwaremill.sttp.tapir" %% "tapir-sttp-client4" % tapirVersion,
+      "org.apache.pekko" %% "pekko-http" % "1.0.1",
+      "org.apache.pekko" %% "pekko-stream" % "1.0.3",
+      "ch.qos.logback" % "logback-classic" % "1.5.6"
+    ) ++ ioLibs
+  )
+  .dependsOn(
+    endpoints.jvm
+  )
 
 lazy val root = project
   .in(file("."))
   .aggregate(
-    domain.js, domain.jvm, codecs.js, codecs.jvm, endpoints.js, endpoints.jvm, frontend
+    domain.js,
+    domain.jvm,
+    codecs.js,
+    codecs.jvm,
+    stubBackend.js,
+    stubBackend.jvm,
+    endpoints.js,
+    endpoints.jvm,
+    frontend,
+    database,
+    nettyWithCats
   )
-
