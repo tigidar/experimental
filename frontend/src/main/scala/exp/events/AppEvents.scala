@@ -1,6 +1,6 @@
 package exp.events
 
-import exp.model.Ticket
+import exp.domain.Ticket
 import kyo.*
 import com.raquo.laminar.api.L
 
