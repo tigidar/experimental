@@ -66,7 +66,8 @@ lazy val kyoDepsJs = Def.setting(
 
 lazy val tapirDepsJs = Def.setting(
   Seq(
-    "com.softwaremill.sttp.tapir" %%% "tapir-core" % tapirVersion,
+
+    "com.softwaremill.sttp.tapir" %%% "tapir-json-pickler" % tapirVersion,
     "com.softwaremill.sttp.tapir" %%% "tapir-json-pickler" % tapirVersion
   )
 )
@@ -74,6 +75,41 @@ lazy val tapirDepsJs = Def.setting(
 lazy val commonSettings = Seq(
   scalaVersion := "3.7.1"
 )
+
+
+lazy val domain = crossProject(JVMPlatform, JSPlatform)
+  .in(file("domain"))
+  .settings(commonSettings)
+  .enablePlugins(ScalaJSPlugin) // Enable the Scala.js plugin in this project
+  .settings(
+    libraryDependencies := supportLibsJs.value
+  )
+
+lazy val codecs = crossProject(JVMPlatform, JSPlatform)
+  .in(file("codecs"))
+  .settings(commonSettings)
+  .settings(
+    libraryDependencies ++= tapirDepsJs.value
+  )
+  .dependsOn(domain)
+
+lazy val endpoints = crossProject(JVMPlatform, JSPlatform)
+  .in(file("endpoints"))
+  .settings(commonSettings)
+  .settings(
+    libraryDependencies ++= supportLibsJs.value ++ tapirDepsJs.value
+  )
+  .dependsOn(codecs)
+
+lazy val stubBackend = project
+  .in(file("stub-backend"))
+  .settings(commonSettings)
+  .settings(
+    libraryDependencies ++= Seq(
+      ("org.scala-js" %%% "scalajs-java-securerandom" % "1.0.0").cross(CrossVersion.for3Use2_13),
+    )
+  )
+  .dependsOn(domain.jvm, endpoints.jvm)
 
 lazy val frontend = project
   .enablePlugins(ScalaJSPlugin) // Enable the Scala.js plugin in this project
@@ -102,32 +138,14 @@ lazy val frontend = project
         )
     }
   )
-  .dependsOn(model.js)
-
-lazy val model = crossProject(JVMPlatform, JSPlatform)
-  .in(file("model"))
-  .settings(commonSettings)
-  .enablePlugins(ScalaJSPlugin) // Enable the Scala.js plugin in this project
-  .settings(
-    scalaVersion := "3.7.1",
-    libraryDependencies := supportLibsJs.value
-  )
-
-lazy val endpoints = crossProject(JVMPlatform, JSPlatform)
-  .in(file("endpoints"))
-  .settings(commonSettings)
-  .settings(
-    scalaVersion := "3.7.1",
-    libraryDependencies ++= supportLibsJs.value ++ tapirDepsJs.value
-  )
-  .dependsOn(model)
+  .dependsOn(endpoints.js)
 
 lazy val allCrossProjects: Seq[sbt.Project] = 
-  Seq(model, endpoints).foldLeft(List.empty[sbt.Project])((acc,p) => acc ++ Seq(p.jvm, p.js)).toSeq
+  Seq(domain, endpoints).foldLeft(List.empty[sbt.Project])((acc,p) => acc ++ Seq(p.jvm, p.js)).toSeq
 
 lazy val root = project
   .in(file("."))
   .aggregate(
-    model.js, model.jvm, endpoints.js, endpoints.jvm, frontend
+    domain.js, domain.jvm, codecs.js, codecs.jvm, endpoints.js, endpoints.jvm, frontend
   )
 

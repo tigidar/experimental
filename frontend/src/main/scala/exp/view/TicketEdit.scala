@@ -5,7 +5,8 @@ import exp.api.Api
 import com.raquo.laminar.api.L
 import com.raquo.laminar.api.L.{*, given}
 import exp.events.{Events, DataEvent}
-import exp.model.Ticket
+import exp.domain.Ticket
+import exp.domain.info
 
 def InputField(
   placeholderText: Option[String],
@@ -23,8 +24,8 @@ object TicketEdit:
   def view(ticket: Ticket) =
     List(
       "id" -> ticket.id,
-      "title" -> ticket.title,
-      "description" -> ticket.description
+      "title" -> ticket.justification.info.title,
+      "description" -> ticket.justification.info.description,
     ).map: (label, data) =>
       div(
         span(margin := "10px", label),

@@ -1,7 +1,7 @@
 package exp.api
 
 import kyo.*
-import exp.model.Ticket
+import exp.domain.Ticket
 import scala.concurrent.Future
 
 trait Api[F[_]]:

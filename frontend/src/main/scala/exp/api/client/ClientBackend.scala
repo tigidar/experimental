@@ -4,6 +4,7 @@ import kyo.*
 import sttp.client4.Backend
 import scala.concurrent.Future
 import sttp.client4.fetch.FetchBackend
+import scala.concurrent.ExecutionContext
 
 trait ClientBackend[F[_]] {
   def get(): Backend[F]
@@ -12,9 +13,9 @@ trait ClientBackend[F[_]] {
 object StubBackend:
 
   // val backend: ClientBackend[Future] = new ClientBackend {
-  val backendLayer: Layer[ClientBackend[Future], IO] = Layer {
+  def backendLayer(using exec: ExecutionContext): Layer[ClientBackend[Future], IO] = Layer {
     new ClientBackend[Future] {
-      def get(): Backend[Future] = exp.backend.Stub.backend
+      def get(): Backend[Future] = exp.backend.Stub().backend
     }
   }
 

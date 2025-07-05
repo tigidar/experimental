@@ -3,11 +3,12 @@ package exp.view
 import exp.ext.*
 import exp.api.Api
 import org.scalajs.dom
+import exp.domain.info
 import com.raquo.laminar.api.L
 import com.raquo.laminar.api.L.{*, given}
 import exp.events.{Events, DataEvent}
 import exp.events.{PageEvent, Events}
-import exp.model.Ticket
+import exp.domain.Ticket
 import com.raquo.laminar.nodes.ReactiveHtmlElement
 
 enum ViewState:
@@ -35,7 +36,7 @@ final case class TicketInnerView(
   def ticketEvent(ticket: Ticket): dom.MouseEvent => Unit = _ =>
     Events.page.emit(PageEvent.TicketEdit(ticket))
 
-  val titleRx = h3( child.text <-- ticketSignal.map(_.title))
+  val titleRx = h3( child.text <-- ticketSignal.map(_.justification.info.title))
 
   def ticketDetails(detailsOrNot: ReactiveHtmlElement[?] | L.CommentNode) =
     div(
@@ -53,7 +54,7 @@ final case class TicketInnerView(
         case ViewState.Details =>
           ticketDetails(
             p(
-              child.text <-- ticketSignal.map(_.description)
+              child.text <-- ticketSignal.map(_.justification.info.description)
             )
           )
         case ViewState.Overview => ticketDetails(emptyNode)
@@ -73,7 +74,7 @@ object TicketList:
     TicketInnerView(
       ticket,
       ticketSignal.map: t =>
-        Ticket(id, t.title, t.description)
+        exp.backend.generator.ticketFactory(),
     ).ticketPanel(viewState)
   )
 

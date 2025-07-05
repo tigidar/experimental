@@ -10,7 +10,7 @@ import exp.view.components.{Menu, Page}
 import exp.events.{Events, DataEvent, PageEvent}
 import exp.client.Client
 import exp.backend.Stub
-import exp.model.Ticket
+import exp.domain.Ticket
 import scala.concurrent.Future
 import sttp.tapir.DecodeResult
 import sttp.tapir.DecodeResult.Missing
@@ -56,7 +56,7 @@ def dataObserver(api: ServerApi): L.Observer[DataEvent] = Observer {
   case DataEvent.Empty =>
   // println("No todos available.")
   case DataEvent.FetchTickets =>
-    api.getTickets().emit(DataEvent.Tickets.apply)
+    api.getTickets.emit(DataEvent.Tickets.apply)
 }
 
 def renderDom(): Unit < (Env[ClientBackend[Future]] & IO) =
@@ -82,19 +82,16 @@ def renderDom(): Unit < (Env[ClientBackend[Future]] & IO) =
 
 object ExperimentalApp extends KyoApp {
 
-  val editPage = PageEvent.TicketEdit(Ticket(
-        "ticket-id",
-        "Ticket title",
-        "Ticket description"
-      ))
+  val editPage = PageEvent.TicketEdit(exp.backend.generator.ticketFactory())
 
   val listPage = PageEvent.TicketList
 
-  lazy val startApp: Unit < IO =
+  def startApp: Unit < IO =
     Memo.run(Env.runLayer(StubBackend.backendLayer)(renderDom()))
 
   run {
     for _ <- startApp
+    _ = println("App started")
     _ <- IO(Events.page.emit(listPage))
     yield ()
   }

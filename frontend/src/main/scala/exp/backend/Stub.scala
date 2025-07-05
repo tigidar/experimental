@@ -4,37 +4,27 @@ import sttp.client4.*
 
 import sttp.client4.testing.{BackendStub, SyncBackendStub}
 import sttp.tapir.server.stub4.*
-import exp.api.Endpoints
-import exp.model.Ticket
+import exp.api.TicketEndpoints
 import exp.client.Client
 import sttp.tapir.server.stub4.TapirStubInterpreter
 import scala.concurrent.Future
+import exp.api.TicketEndpoints
+import scala.concurrent.ExecutionContext
 
-object Stub:
+import sttp.tapir.json.pickler.*
+import sttp.tapir.json.pickler.generic.auto.*
+import sttp.tapir.generic.auto.*
 
-  given executionContext: scala.concurrent.ExecutionContext =
-    scala.concurrent.ExecutionContext.global
+final class Stub(using exec: ExecutionContext):
 
   lazy val result = scala.concurrent.Future.successful(
-    IndexedSeq(
-      Ticket(
-        "todo-1",
-        "Todo 1",
-        "This is a description for Todo 1"
-      ),
-      Ticket(
-        "todo-2",
-        "Todo 2",
-        "This is a description for Todo 2"
-      ),
-      Ticket("todo-3", "Todo 3", "This is a description for Todo 3")
-    )
-  )
+    IndexedSeq(exp.backend.generator.ticketFactory()
+  ))
 
   lazy val backend: Backend[Future] =
     TapirStubInterpreter(BackendStub.asynchronousFuture)
       .whenServerEndpoint(
-        Endpoints.getTickets().serverLogicSuccess { _ =>
+        TicketEndpoints.getTickets().serverLogicSuccess { _ =>
           result
         }
       )
