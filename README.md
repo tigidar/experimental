@@ -46,6 +46,7 @@ The endpoints should be shared between the frontend and the backend, and then we
 
 ## Done
 
+- modularize, putting common code in modules available for frontend and backend
 - Implement the TODO api for fetching todos with a mocked tapir backend using sttp.
 - Clean up everything, make boundary contexts
 - Integrate kyo Env and Layer to be able to easily create fakes that also can be utilized during development cycle.
