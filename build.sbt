@@ -2,12 +2,13 @@ import org.scalajs.linker.interface.ModuleSplitStyle
 import org.scalajs.jsenv.nodejs.*
 
 lazy val tapirVersion = "1.11.35"
-lazy val kyoVersion = "1.11.35"
+lazy val kyoVersion = "0.19.0"
 lazy val sourcecodeVersion = "0.4.2"
 lazy val sttpVersion = "4.0.7"
 lazy val fs2Version = "3.12.0"
 lazy val scalaJavaTimeVersion = "2.6.0"
 lazy val scalaJsDomVersion = "2.8.0"
+lazy val scalaUriVersion = "4.1.0"
 lazy val laminarVersion = "17.2.1"
 
 def ^(deps: ModuleID*) =
@@ -32,11 +33,13 @@ lazy val supportLibs = ^(
   "io.github.cquiroz" %% "scala-java-time" % scalaJavaTimeVersion
 )
 
-lazy val frontendLibs = ^(
-  "org.scala-js" %% "scalajs-dom" % scalaJsDomVersion,
-  "com.raquo" %% "laminar" % laminarVersion,
-  "com.indoorvivants" %% "scala-uri" % "4.1.0"
-)
+lazy val frontendLibs = Def.setting(Seq(
+  "org.scala-js" %%% "scalajs-dom" % scalaJsDomVersion,
+  "com.raquo" %%% "laminar" % laminarVersion,
+  "com.indoorvivants" %%% "scala-uri" % scalaUriVersion,
+  "com.softwaremill.sttp.tapir" %%% "tapir-sttp-stub4-server" % tapirVersion,
+  "org.scalameta" %%% "munit" % "1.1.0" % Test,
+))
 
 lazy val ioLibs = ^(
   "com.softwaremill.sttp.client4" %% "core" % sttpVersion,
@@ -77,13 +80,10 @@ lazy val frontend = project
   .settings(commonSettings)
   .settings(
     libraryDependencies ++=
-      frontendLibs ++
+      frontendLibs.value ++
         supportLibsJs.value ++
-        Seq(
-          // Testing framework
-          "org.scalameta" %%% "munit" % "1.1.0" % Test,
-          "com.softwaremill.sttp.tapir" %%% "tapir-sttp-stub4-server" % tapirVersion
-        ),
+        kyoDepsJs.value ++
+        tapirDepsJs.value,
 
     // Tell Scala.js that this is an application with a main method
     scalaJSUseMainModuleInitializer := true,
@@ -106,6 +106,7 @@ lazy val frontend = project
 
 lazy val model = crossProject(JVMPlatform, JSPlatform)
   .in(file("model"))
+  .settings(commonSettings)
   .enablePlugins(ScalaJSPlugin) // Enable the Scala.js plugin in this project
   .settings(
     scalaVersion := "3.7.1",
@@ -114,6 +115,7 @@ lazy val model = crossProject(JVMPlatform, JSPlatform)
 
 lazy val endpoints = crossProject(JVMPlatform, JSPlatform)
   .in(file("endpoints"))
+  .settings(commonSettings)
   .settings(
     scalaVersion := "3.7.1",
     libraryDependencies ++= supportLibsJs.value ++ tapirDepsJs.value
