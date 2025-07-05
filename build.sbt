@@ -1,31 +1,5 @@
-//import sbt._
-//import sbt.Keys._
-
-//import sbtcrossproject.CrossPlugin.autoImport._
-//import sbtcrossproject.Platform
-//import sbtcrossproject.JVMPlatform
-//import sbtcrossproject.JSPlatform
-
-//import scalajscrossproject.ScalaJSCrossPlugin.autoImport._
-
 import org.scalajs.linker.interface.ModuleSplitStyle
-
-//import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
-//import sbtcrossproject.CrossPlugin.autoImport._
-//import scalajscrossproject.ScalaJSCrossPlugin.autoImport._
-//import sbtcrossproject.JVMPlatform
-//import sbtcrossproject.JSPlatform
-//import sbtcrossproject.JVMPlatform
-//import sbtcrossproject.JSPlatform
-
-//import com.github.sbt.git.SbtGit.GitKeys.useConsoleForROGit
 import org.scalajs.jsenv.nodejs.*
-/*
-import org.typelevel.scalacoptions.ScalacOption
-import org.typelevel.scalacoptions.ScalacOptions
-import org.typelevel.scalacoptions.ScalaVersion
-import sbtdynver.DynVerPlugin.autoImport.*
- */
 
 lazy val tapirVersion = "1.11.35"
 lazy val kyoVersion = "1.11.35"
@@ -155,20 +129,3 @@ lazy val root = project
     model.js, model.jvm, endpoints.js, endpoints.jvm, frontend
   )
 
-/*
-import ujson.Value
-lazy val externalDepsJs = settingKey[Seq[ModuleID]]("deps.json → ModuleID list")
-    externalDepsJs := {
-      val raw = IO.read(baseDirectory.value / "deps.json")
-      val arr = ujson.read(raw).arr
-      arr.map { v =>
-        val org = v("group").str
-        val art = v("artifact").str
-        val ver = v("version").str
-        //val art0 = s"${art}_${scalaVersion.value.takeWhile(_ != '.')}"
-
-        val dep0 = org %%% art % ver
-        v.obj.get("scope").fold(dep0)(s => dep0 % s.str)
-      }.toSeq
-    },
- */
