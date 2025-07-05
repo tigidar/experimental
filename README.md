@@ -39,12 +39,13 @@ The endpoints should be shared between the frontend and the backend, and then we
 ## TODOS
 
 0. Ensure common build settings / scala version on all modules
-1. Add server setup
-2. Domain cleanup
-3. See if there are ways to write unit tests etc.
-4. Fix event model so it works according to the domain
-5. Implement simple crud
-6. Are there any magical things we can use from kyo for a simple backend?
+1. Move Frontend server stub out into its own module
+2. Add server setup
+3. Domain cleanup
+4. See if there are ways to write unit tests etc.
+5. Fix event model so it works according to the domain
+6. Implement simple crud
+7. Are there any magical things we can use from kyo for a simple backend?
 
 
 ## Done
