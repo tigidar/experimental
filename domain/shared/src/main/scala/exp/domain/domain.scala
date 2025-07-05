@@ -89,3 +89,4 @@ final case class EmailAddress(
     localPart: String,
     domain: String
 )
+

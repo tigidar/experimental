@@ -97,8 +97,11 @@ object codec:
 
   given ReadWriter[Ticket] = macroRW
   given Schema[Ticket] = Schema.derived
-  given Pickler[Ticket] = Pickler.derived[Ticket]
 
   given ReadWriter[EmailAddress] = macroRW
   given Schema[EmailAddress] = Schema.derived
+
+  //TODO: All of the above could possibly be removed
+  // delegating to this line of code
+  given Pickler[Ticket] = Pickler.derived[Ticket]
 
