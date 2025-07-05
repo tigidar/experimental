@@ -42,10 +42,11 @@ The endpoints should be shared between the frontend and the backend, and then we
 1. Move Frontend server stub out into its own module
 2. Add server setup
 3. Domain cleanup
-4. See if there are ways to write unit tests etc.
-5. Fix event model so it works according to the domain
-6. Implement simple crud
-7. Are there any magical things we can use from kyo for a simple backend?
+4. automate the formatting, most effectively within the CI pipeline, find best practices
+5. See if there are ways to write unit tests etc.
+6. Fix event model so it works according to the domain
+7. Implement simple crud
+8. Are there any magical things we can use from kyo for a simple backend?
 
 
 ## Done
